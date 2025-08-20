@@ -121,7 +121,35 @@ export const api = {
     if (userId) params.set("user_id", String(userId));
     return request(`/calendar/events?${params.toString()}`, { method: "GET" });
   },
+  // PUBLIC_INTERFACE
+  syncCalendar: async (userId, source) => {
+    /** Connect/sync a calendar source (URL or ICS text) for a user */
+    return request(`/calendar/sync`, {
+      method: "POST",
+      body: JSON.stringify({ user_id: userId, source }),
+    });
+  },
 };
+
+// PUBLIC_INTERFACE
+export function formatDateRange(startISO, endISO) {
+  /** Utility to format start/end into a friendly string */
+  try {
+    const start = startISO ? new Date(startISO) : null;
+    const end = endISO ? new Date(endISO) : null;
+    if (!start && !end) return "";
+    if (start && !end) return `${start.toLocaleString()}`;
+    if (!start && end) return `${end.toLocaleString()}`;
+    const sameDay =
+      start.toDateString && end.toDateString && start.toDateString() === end.toDateString();
+    if (sameDay) {
+      return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    }
+    return `${start.toLocaleString()} - ${end.toLocaleString()}`;
+  } catch {
+    return `${startISO || ""}${endISO ? ` - ${endISO}` : ""}`;
+  }
+}
 
 export default api;
 ```
