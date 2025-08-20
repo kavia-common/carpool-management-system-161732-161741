@@ -11,3 +11,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+label { display: block; margin-bottom: 6px; font-weight: 600; }
+input, select, textarea {
+  font: inherit;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+}
+button { font: inherit; }
