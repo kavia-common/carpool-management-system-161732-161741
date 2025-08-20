@@ -95,6 +95,23 @@ export const api = {
   listRideOffers: async () => request("/rides/offers", { method: "GET" }),
   // PUBLIC_INTERFACE
   listRideRequests: async () => request("/rides/requests", { method: "GET" }),
+  // PUBLIC_INTERFACE
+  createRideOffer: async (payload) =>
+    request("/rides/offers", { method: "POST", body: JSON.stringify(payload) }),
+  // PUBLIC_INTERFACE
+  createRideRequest: async (payload) =>
+    request("/rides/requests", { method: "POST", body: JSON.stringify(payload) }),
+  // PUBLIC_INTERFACE
+  confirmRideRequest: async (requestId, offerId) =>
+    request(`/rides/requests/${encodeURIComponent(requestId)}/confirm?offer_id=${encodeURIComponent(offerId)}`, {
+      method: "POST",
+    }),
+  // PUBLIC_INTERFACE
+  cancelRideRequest: async (requestId) =>
+    request(`/rides/requests/${encodeURIComponent(requestId)}/cancel`, { method: "POST" }),
+  // PUBLIC_INTERFACE
+  cancelRideOffer: async (offerId) =>
+    request(`/rides/offers/${encodeURIComponent(offerId)}/cancel`, { method: "POST" }),
 
   /** Calendar endpoints */
   // PUBLIC_INTERFACE
