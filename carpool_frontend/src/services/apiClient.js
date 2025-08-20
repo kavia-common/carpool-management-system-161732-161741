@@ -129,6 +129,28 @@ export const api = {
       body: JSON.stringify({ user_id: userId, source }),
     });
   },
+
+  /** Admin endpoints */
+  // PUBLIC_INTERFACE
+  getAdminUsers: async () => {
+    /** Fetch all users via admin scope */
+    return request("/admin/users", { method: "GET" });
+  },
+  // PUBLIC_INTERFACE
+  getAdminRides: async () => {
+    /** Fetch all rides via admin scope */
+    return request("/admin/rides", { method: "GET" });
+  },
+
+  /** User updates */
+  // PUBLIC_INTERFACE
+  updateUserRole: async (userId, role) => {
+    /** Update only the role field for a user using PATCH /users/{id} */
+    return request(`/users/${encodeURIComponent(userId)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ role }),
+    });
+  },
 };
 
 // PUBLIC_INTERFACE
