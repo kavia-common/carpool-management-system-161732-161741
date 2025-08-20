@@ -1,0 +1,4 @@
+{
+    "command": "npm run test",
+    "working_directory": "/home/kavia/workspace/code-generation/carpool-management-system-161732-161741/carpool_frontend"
+}
