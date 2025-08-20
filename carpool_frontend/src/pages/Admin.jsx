@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import AppLayout from "../components/AppLayout";
 import { api } from "../services/apiClient";
+import { useNotifications } from "../context/NotificationContext";
 import { useAuth } from "../context/AuthContext";
 
 /**
@@ -9,6 +10,7 @@ import { useAuth } from "../context/AuthContext";
  */
 export default function Admin() {
   const { user: currentUser } = useAuth();
+  const { addToast } = useNotifications();
   const [users, setUsers] = useState([]);
   const [rides, setRides] = useState({ offers: [], requests: [] });
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,7 @@ export default function Admin() {
       setRides({ offers, requests });
     } catch (e) {
       setErr(e?.message || "Failed to load admin data");
+      addToast(e?.message || "Failed to load admin data", { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -56,8 +59,9 @@ export default function Admin() {
     try {
       const updated = await api.updateUserRole(u.id, newRole);
       setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, role: updated.role || newRole } : x)));
+      addToast(`Updated ${u.full_name}'s role to ${updated.role || newRole}`, { variant: "success" });
     } catch (e) {
-      alert(e?.message || "Failed to update role");
+      addToast(e?.message || "Failed to update role", { variant: "error" });
     }
   };
 

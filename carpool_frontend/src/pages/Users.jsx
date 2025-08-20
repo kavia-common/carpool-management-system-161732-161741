@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AppLayout from "../components/AppLayout";
 import { api } from "../services/apiClient";
+import { useNotifications } from "../context/NotificationContext";
 
 /**
  * PUBLIC_INTERFACE
@@ -9,6 +10,7 @@ import { api } from "../services/apiClient";
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [err, setErr] = useState("");
+  const { addToast } = useNotifications();
 
   useEffect(() => {
     api
@@ -16,7 +18,9 @@ export default function Users() {
       .then((d) => setUsers(d || []))
       .catch((e) => {
         setUsers([]);
-        setErr(e?.message || "Failed to load users");
+        const msg = e?.message || "Failed to load users";
+        setErr(msg);
+        addToast(msg, { variant: "error" });
       });
   }, []);
 

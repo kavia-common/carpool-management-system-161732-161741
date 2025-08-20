@@ -6,6 +6,7 @@ import RideRequestForm from "../components/rides/RideRequestForm";
 import RideOfferList from "../components/rides/RideOfferList";
 import RideRequestList from "../components/rides/RideRequestList";
 import { useAuth } from "../context/AuthContext";
+import { useNotifications } from "../context/NotificationContext";
 
 /**
  * PUBLIC_INTERFACE
@@ -13,6 +14,8 @@ import { useAuth } from "../context/AuthContext";
  */
 export default function Rides() {
   const { user } = useAuth();
+  const { addToast } = useNotifications();
+
   const [meta, setMeta] = useState(null);
   const [offers, setOffers] = useState([]);
   const [requests, setRequests] = useState([]);
@@ -28,31 +31,39 @@ export default function Rides() {
       setOffers(o || []);
       setRequests(r || []);
     } catch (e) {
-      setErr(e?.message || "Failed to load rides");
+      const msg = e?.message || "Failed to load rides";
+      setErr(msg);
+      addToast(msg, { variant: "error" });
     } finally {
       setLoading(false);
+      if (!err) {
+        addToast("Rides reloaded", { variant: "success", timeout: 2000 });
+      }
     }
   };
 
   useEffect(() => {
     reload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onOfferCreated = (created) => {
-    // optimistic append
     setOffers((prev) => [created, ...prev]);
+    addToast(`Ride offer #${created?.id || ""} created`, { variant: "success" });
   };
 
   const onRequestCreated = (created) => {
     setRequests((prev) => [created, ...prev]);
+    addToast(`Ride request #${created?.id || ""} created`, { variant: "success" });
   };
 
   const onCancelOffer = async (offer) => {
     try {
       const updated = await api.cancelRideOffer(offer.id);
       setOffers((prev) => prev.map((o) => (o.id === offer.id ? updated : o)));
+      addToast(`Offer #${offer.id} cancelled`, { variant: "info" });
     } catch (e) {
-      alert(e?.message || "Failed to cancel offer");
+      addToast(e?.message || "Failed to cancel offer", { variant: "error" });
     }
   };
 
@@ -60,11 +71,11 @@ export default function Rides() {
     try {
       const updated = await api.cancelRideRequest(request.id);
       setRequests((prev) => prev.map((r) => (r.id === request.id ? updated : r)));
-      // Refresh offers as seats may be released after cancel
       const refreshedOffers = await api.listRideOffers();
       setOffers(refreshedOffers || []);
+      addToast(`Request #${request.id} cancelled`, { variant: "info" });
     } catch (e) {
-      alert(e?.message || "Failed to cancel request");
+      addToast(e?.message || "Failed to cancel request", { variant: "error" });
     }
   };
 
@@ -72,11 +83,11 @@ export default function Rides() {
     try {
       const updatedReq = await api.confirmRideRequest(request.id, offerId);
       setRequests((prev) => prev.map((r) => (r.id === request.id ? updatedReq : r)));
-      // Refresh offers to reflect reduced seats after confirmation
       const refreshedOffers = await api.listRideOffers();
       setOffers(refreshedOffers || []);
+      addToast(`Request #${request.id} confirmed with offer #${offerId}`, { variant: "success" });
     } catch (e) {
-      alert(e?.message || "Failed to confirm request");
+      addToast(e?.message || "Failed to confirm request", { variant: "error" });
     }
   };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import AppLayout from "../components/AppLayout";
 import { api, formatDateRange } from "../services/apiClient";
+import { useNotifications } from "../context/NotificationContext";
 import { useAuth } from "../context/AuthContext";
 
 /**
@@ -9,6 +10,7 @@ import { useAuth } from "../context/AuthContext";
  */
 export default function Calendar() {
   const { user } = useAuth();
+  const { addToast } = useNotifications();
   const [days, setDays] = useState(7);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +29,7 @@ export default function Calendar() {
       setEvents(Array.isArray(data) ? data : []);
     } catch (e) {
       setErr(e?.message || "Failed to load events");
+      addToast(e?.message || "Failed to load events", { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -47,9 +50,9 @@ export default function Calendar() {
     try {
       const res = await api.syncCalendar(user.id, syncUrl);
       const connected = res?.connected_sources;
-      setSyncMsg(
-        `Sync successful. ${typeof connected === "number" ? connected : "Updated"} source(s) connected.`
-      );
+      const msg = `Sync successful. ${typeof connected === "number" ? connected : "Updated"} source(s) connected.`;
+      setSyncMsg(msg);
+      addToast(msg, { variant: "success" });
       // Reload events after successful sync
       await load();
       setSyncUrl("");

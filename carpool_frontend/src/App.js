@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { AuthProvider } from "./context/AuthContext";
+import { NotificationProvider } from "./context/NotificationContext";
+import ToastContainer from "./components/ToastContainer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import Login from "./pages/Login";
@@ -33,26 +35,29 @@ function App() {
         {theme === "light" ? "🌙 Dark" : "☀️ Light"}
       </button>
 
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/login" element={<Login />} />
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/rides" element={<Rides />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/users" element={<Users />} />
-            </Route>
+      <NotificationProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/login" element={<Login />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/rides" element={<Rides />} />
+                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/users" element={<Users />} />
+              </Route>
 
-            <Route element={<AdminRoute />}>
-              <Route path="/admin" element={<Admin />} />
-            </Route>
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<Admin />} />
+              </Route>
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+          <ToastContainer />
+        </AuthProvider>
+      </NotificationProvider>
     </div>
   );
 }

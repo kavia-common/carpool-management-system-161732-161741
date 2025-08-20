@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useNotifications } from "../context/NotificationContext";
 import "../components/layout.css";
 
 /**
@@ -9,6 +10,7 @@ import "../components/layout.css";
  */
 export default function Login() {
   const { token, login } = useAuth();
+  const { addToast } = useNotifications();
   const navigate = useNavigate();
   const [email, setEmail] = useState("parent@example.com");
   const [password, setPassword] = useState("password");
@@ -25,9 +27,11 @@ export default function Login() {
     setError("");
     try {
       await login(email, password);
+      addToast("Signed in successfully", { variant: "success" });
       navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err?.message || "Login failed");
+      addToast(err?.message || "Login failed", { variant: "error" });
     } finally {
       setSubmitting(false);
     }
